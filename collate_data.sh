@@ -7,9 +7,10 @@
 # the prefix chosen this file runs from ones data folder eg data/coml-lognormal-lung/newc5233 for me on arcus, so you
 # must be in this directory for the command to work move to the correct directory using "cd $DATA" on arcus
 
-if [ ! -d ./Collated_Fits ]; then
+if [ ! -d ./Collated_Fits ];
+then
 
-mkdir Collated_Fits
+    mkdir Collated_Fits
 
 fi
 
@@ -19,23 +20,29 @@ mkdir Collated_Fits/$filename
 rm ./Collated_Fits/$filename'_output.csv'
 
 for timestamp in $(cut -d, -f$2 '$1' | sed 1d)
-
 do
 
-for directory in $timestamp*lung/fits/$4
-do find $directory | xargs grep -nr "vResidual"  | sed -e 's/\//,/g' | sort -nt, -k6 | head -n 1 >> Collated_Fits/$filename'_output.csv'
+    for directory in $timestamp*lung/fits/$4
+    do
+
+        find $directory | xargs grep -nr "vResidual"  | sed -e 's/\//,/g' | sort -nt, -k6 | head -n 1 >> Collated_Fits/$filename'_output.csv'
+
+    done
+
 done
+
+for jobid in $(cut -d, -f4 Collated_Fits/$filename'_output.csv')
+do
+
+    find *lung/fits/$4/$jobid/*data.txt -execdir cp {} $DATA/Collated_Fits/$filename/{} \;
 
 done
 
 for jobid in $(cut -d, -f4 Collated_Fits/$filename'_output.csv')
 do
-find *lung/fits/$4/$jobid/*data.txt -execdir cp {} $DATA/Collated_Fits/$filename/{} \;
-done
 
-for jobid in $(cut -d, -f4 Collated_Fits/$filename'_output.csv')
-do
-find *lung/fits/$1/$jobid/*data.csv -execdir cp {} $DATA/Collated_Fits/$filename/{} \;
-find *lung/fits/$1/$jobid/*params.csv -execdir cp {} $DATA/Collated_Fits/$filename/{} \;
-find *lung/fits/$1/$jobid/*all.pdf -execdir cp {} $DATA/Collated_Fits/$filename/{} \;
+    find *lung/fits/$1/$jobid/*data.csv -execdir cp {} $DATA/Collated_Fits/$filename/{} \;
+    find *lung/fits/$1/$jobid/*params.csv -execdir cp {} $DATA/Collated_Fits/$filename/{} \;
+    find *lung/fits/$1/$jobid/*all.pdf -execdir cp {} $DATA/Collated_Fits/$filename/{} \;
+
 done
